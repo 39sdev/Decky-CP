@@ -40,21 +40,41 @@ class Plugin:
         return "".join(secrets.choice(ALPHANUM) for _ in range(6))
 
     @staticmethod
+    def _get_home_dir():
+        return (
+            os.environ.get("HOME")
+            or getattr(decky_plugin, "DECKY_USER_HOME", None)
+            or str(Path.home())
+        )
+
+    @staticmethod
+    def _get_user():
+        return (
+            os.environ.get("DECKY_USER")
+            or os.environ.get("USER")
+            or getattr(decky_plugin, "DECKY_USER", None)
+            or "deck"
+        )
+
+    @staticmethod
     def _build_command():
-        # Grant deck user full rw/delete over /home/deck
+        # Grant the target user full rw/delete over their home dir
         if not Plugin._password:
             Plugin._password = Plugin._generate_password()
-        auth_arg = f"deck:{Plugin._password}"
+        home_dir = Plugin._get_home_dir()
+        user = Plugin._get_user()
+        volume_arg = f"{home_dir}::A,{user}"
+        auth_arg = f"{user}:{Plugin._password}"
         return [
             "sudo",
             "-u",
-            "deck",
+            user,
             "-E",
             "copyparty-sfx.py",
             "-p",
             str(COPYPARTY_PORT),
             "-v",
-            "/home/deck::A,deck",
+            volume_arg,
             "-a",
             auth_arg,
         ]
@@ -72,7 +92,10 @@ class Plugin:
     @staticmethod
     def _start_process():
         env = os.environ.copy()
-        env["HOME"] = "/home/deck"
+        home_dir = Plugin._get_home_dir()
+        user = Plugin._get_user()
+        env["HOME"] = home_dir
+        env["USER"] = user
         cmd = Plugin._build_command()
         logger.info(f"Starting Copyparty on port {COPYPARTY_PORT}")
         Plugin._proc = subprocess.Popen(
@@ -98,11 +121,13 @@ class Plugin:
         url = None
         ip = self._get_local_ip()
         if Plugin._enabled and ip:
-            url = f"http(s)://{ip}:{COPYPARTY_PORT}"
+            url = f"http://{ip}:{COPYPARTY_PORT}"
         return {
             "enabled": Plugin._enabled,
             "password": Plugin._password if Plugin._enabled else None,
             "url": url,
+            "home": self._get_home_dir(),
+            "user": self._get_user(),
         }
 
     async def copyparty_runner(self):

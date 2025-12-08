@@ -4,7 +4,7 @@
   "flags": ["debug"],
   "publish": {
     "tags": ["control", "files"],
-    "description": "Run copyparty to serve /home/deck with password auth.",
+    "description": "Manage the deck's filesystem from a web browser via Copyparty!",
     "image": "https://github.com/safijari/Decky-KDE-Connect/raw/main/kde_screenshot.png"
   }
 }

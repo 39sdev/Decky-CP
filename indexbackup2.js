@@ -94,16 +94,12 @@
       const [enabled, setEnabled] = React.useState(false);
       const [password, setPassword] = React.useState(null);
       const [serverUrl, setServerUrl] = React.useState(null);
-      const [homeDir, setHomeDir] = React.useState(null);
-      const [user, setUser] = React.useState(null);
       const refreshStatus = async () => {
           const status = await serverAPI.callPluginMethod("get_status", {});
           const result = status.result;
           setEnabled(!!result?.enabled);
           setPassword(result?.password ?? null);
           setServerUrl(result?.url ?? null);
-          setHomeDir(result?.home ?? null);
-          setUser(result?.user ?? null);
       };
       const onToggle = async (value) => {
           setEnabled(value);
@@ -113,7 +109,6 @@
       React.useEffect(() => {
           refreshStatus();
       }, []);
-      const displayUser = user || "deck";
       return (window.SP_REACT.createElement(deckyFrontendLib.PanelSection, null,
           window.SP_REACT.createElement(deckyFrontendLib.PanelSectionRow, null,
               window.SP_REACT.createElement(deckyFrontendLib.ToggleField, { label: "Enable Copyparty FileServer", checked: enabled, onChange: onToggle })),
@@ -121,7 +116,7 @@
               window.SP_REACT.createElement("div", null, "Enabling will expose your deck's file system via the copyparty fileserver to your Local Network.")),
           window.SP_REACT.createElement(deckyFrontendLib.PanelSectionRow, null,
               window.SP_REACT.createElement("div", null, enabled && password
-                  ? `Password (user '${displayUser}'): ${password}`
+                  ? `Password: ${password}`
                   : "A new 6-character password is generated each time you enable the server.")),
           window.SP_REACT.createElement(deckyFrontendLib.PanelSectionRow, null,
               window.SP_REACT.createElement("div", null, enabled && serverUrl
