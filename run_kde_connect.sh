@@ -1,1 +1,0 @@
-./defaults/run_kde_connect.sh

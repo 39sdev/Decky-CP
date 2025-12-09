@@ -124,7 +124,7 @@ class Plugin:
         url = None
         ip = self._get_local_ip()
         if Plugin._enabled and ip:
-            url = f"http://{ip}:{COPYPARTY_PORT}"
+            url = f"http(s)://{ip}:{COPYPARTY_PORT}"
         return {
             "enabled": Plugin._enabled,
             "password": Plugin._password if Plugin._enabled else None,

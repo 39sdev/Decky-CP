@@ -72,7 +72,7 @@ const Content: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
         <div>
           {enabled && serverUrl
             ? `Reachable at: ${serverUrl}`
-            : "Enable the server to see the access URL."}
+            : ""}
         </div>
       </PanelSectionRow>
     </PanelSection>
