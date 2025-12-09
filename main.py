@@ -59,15 +59,28 @@ class Plugin:
         )
 
     @staticmethod
+    def _get_sd_mounts():
+        mounts = []
+        base = Path("/run/media") / Plugin._get_user()
+        if base.exists() and base.is_dir():
+            for entry in sorted(base.iterdir(), key=lambda p: p.name):
+                if entry.is_dir():
+                    mounts.append(entry)
+        return mounts
+
+    @staticmethod
     def _build_command():
         # Grant the target user full rw/delete over their home dir
         if not Plugin._password:
             Plugin._password = Plugin._generate_password()
         home_dir = Plugin._get_home_dir()
         user = Plugin._get_user()
-        volume_arg = f"{home_dir}::A,{user}"
+        volumes = [(home_dir, None)]  # root at /
+        for idx, sd_mount in enumerate(Plugin._get_sd_mounts(), start=1):
+            # Expose SD cards as numbered external storage mounts
+            volumes.append((sd_mount, f"{idx}_EXTERNAL_STORAGE"))
         auth_arg = f"{user}:{Plugin._password}"
-        return [
+        cmd = [
             "sudo",
             "-u",
             user,
@@ -75,11 +88,15 @@ class Plugin:
             str(SCRIPT_PATH),
             "-p",
             str(COPYPARTY_PORT),
-            "-v",
-            volume_arg,
-            "-a",
-            auth_arg,
         ]
+        for src, dst in volumes:
+            if dst:
+                vol_arg = f"{src}:{dst}:A,{user}"
+            else:
+                vol_arg = f"{src}::A,{user}"
+            cmd.extend(["-v", vol_arg])
+        cmd.extend(["-a", auth_arg])
+        return cmd
 
     @staticmethod
     def _stop_process():
@@ -101,6 +118,7 @@ class Plugin:
         #logger.info(f"Using Copyparty script at {SCRIPT_PATH} (exists={SCRIPT_PATH.exists()}) with python {sys.executable}")
         cmd = Plugin._build_command()
         logger.info(f"Starting Copyparty on port {COPYPARTY_PORT}")
+        #logger.info(f"Copyparty cmd: {' '.join(cmd)}")
         Plugin._proc = subprocess.Popen(
             cmd,
             stdout=std_out_file,
