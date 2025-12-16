@@ -1,9 +1,9 @@
 {
-  "name": "DeckyParty",
+  "name": "DeckyParty File Manager",
   "author": "miku",
   "flags": ["debug"],
   "publish": {
-    "tags": ["control", "files"],
+    "tags": ["control", "files", "management", "web", "utility", "fileserver"],
     "description": "Manage the deck's filesystem from a web browser via Copyparty!",
     "image": "https://raw.githubusercontent.com/9001/copyparty/hovudstraum/docs/logo.svg"
   }
