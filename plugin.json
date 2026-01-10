@@ -5,6 +5,6 @@
   "publish": {
     "tags": ["control", "files", "management", "web", "utility", "fileserver"],
     "description": "Manage the deck's filesystem from a web browser via Copyparty!",
-    "image": "https://raw.githubusercontent.com/9001/copyparty/hovudstraum/docs/logo.svg"
+    "image": "https://github.com/39sdev/Decky-CP/raw/main/plugin_screenshot.jpg"
   }
 }
